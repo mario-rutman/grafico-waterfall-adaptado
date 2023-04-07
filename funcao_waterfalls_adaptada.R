@@ -17,7 +17,7 @@ waterfall_adaptado <- function(.data = NULL,
                       rect_text_labels_anchor = "center",
                       put_rect_text_outside_when_value_below = 0.05*(max(cumsum(values)) - min(cumsum(values))),
                       calc_total = FALSE,
-                      total_axis_text = "Estoque\nFinal",
+                      total_axis_text = "Total",
                       total_rect_text = sum(values),
                       total_rect_color = "black",
                       total_rect_border_color = "black",
@@ -293,13 +293,13 @@ faz_grafico_cascata_processos <- function(audr) {
               total_rect_text_color = "black") +
     labs(title = paste("Estoque, entradas e saídas de processos na caixa da",audr),
          caption = "fonte: SEI-RJ/Estatísticas") +
-    geom_hline(yintercept = jto*0.5, linetype = "3313", size = 0.7, color="black", alpha = 0.5) +
-    annotate("text", x = "EI mar-23", y = jto*0.9, label = "-10%", vjust = -0.35, hjust = -10) +
-    geom_hline(yintercept = jto*0.8, linetype = "dotted", size = 1, color="black", alpha = 0.5) +
-    annotate("text", x = "EI mar-23", y = jto*0.8, label = "-20%", vjust = -0.35, hjust = -10) +
-    geom_hline(yintercept = jto*0.7) +
-    annotate("text", x = "EI mar-23", y = jto*0.7, label = "-30%", vjust = -0.35, hjust = -10) +
-    scale_x_discrete(labels=c("Est. Inic.\nmar-23", "Entradas\nmar-23","Saídas\nmar-23",
+    geom_hline(yintercept = jto*0.75, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    # annotate("text", x = "EI mar-23", y = jto*0.9, label = "-10%", vjust = -0.35, hjust = -10) +
+    geom_hline(yintercept = jto*0.5, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    # annotate("text", x = "EI mar-23", y = jto*0.8, label = "-20%", vjust = -0.35, hjust = -10) +
+    geom_hline(yintercept = jto*0.25, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    #annotate("text", x = "EI mar-23", y = jto*0.7, label = "-30%", vjust = -0.35, hjust = -10) +
+    scale_x_discrete(labels=c("Estoque Inicial\nmar-23", "Entradas\nmar-23","Saídas\nmar-23",
                               "Entradas\nabr-23","Saídas\nabr-23",
                               "Entradas\nmai-23","Saídas\nmai-23",
                               "Entradas\njun-23","Saídas\njun-23","Estoque\nFinal")) +
@@ -314,7 +314,12 @@ faz_grafico_cascata_processos <- function(audr) {
           panel.grid.minor = element_blank())
 }
 
+# Quanto ao estoque de processos o gráfico indica...
+# Quanto a fluxo, mostra...
+
 # Exemplo.
 faz_grafico_cascata_processos("07.01")
 faz_grafico_cascata_processos("64.12")
 faz_grafico_cascata_processos("DAC")
+faz_grafico_cascata_processos("33.01")
+faz_grafico_cascata_processos("SUACO")
