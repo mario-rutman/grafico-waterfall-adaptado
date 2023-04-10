@@ -1,0 +1,215 @@
+---
+title: "Entradas, saídas e estoque de processos nas caixas SEI."
+author: "Mário Rutman, 3-abr-2023"
+date: ""
+output: 
+  html_document:
+    highlight: espresso
+    theme: united
+---
+
+```{r setup, include=FALSE, warning=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(ggplot2)
+library(dplyr)
+library(waterfalls)
+
+# Carregando o arquivo principal.
+grafico_cascata_proc_sei <- readRDS("data-raw/rds/grafico_cascata_proc_sei.rds")
+prepara_frase <- readRDS("data-raw/rds/prepara_frase.rds")
+
+# Carregando as 2 funções.
+source("scripts/script_01.R")
+
+```
+
+## {.tabset .tabset-pills}
+
+### __Todas Regionais + DAC + SUACO__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+
+todas_regio <- grafico_cascata_proc_sei |> 
+  group_by(periodo) |> 
+  summarise(variacao = sum(variacao),
+            indice = sum(indice)) |> 
+  arrange(indice)
+
+kyp <- todas_regio |> 
+  select(variacao) |> 
+  slice(1) |> 
+  pull()
+
+# Fazendo o gráfico.
+todas_regio |>
+  select(periodo, variacao) |> 
+  adpt_waterfall(calc_total = TRUE,
+                       fill_by_sign = FALSE,
+                       fill_colours = c("red","red","green", "red","green",
+                                        "red", "green", "red","green"),
+                       total_rect_color = "#E95420",
+                       total_rect_text_color = "black") +
+    labs(title = "Estoque, entradas e saídas de processos de todas Regionais, DAC e SUACO",
+         caption = "fonte: SEI-RJ/Estatísticas") +
+    geom_hline(yintercept = kyp*0.75, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    # annotate("text", x = "EI mar-23", y = jto*0.9, label = "-10%", vjust = -0.35, hjust = -10) +
+    geom_hline(yintercept = kyp*0.5, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    # annotate("text", x = "EI mar-23", y = jto*0.8, label = "-20%", vjust = -0.35, hjust = -10) +
+    geom_hline(yintercept = kyp*0.25, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
+    #annotate("text", x = "EI mar-23", y = jto*0.7, label = "-30%", vjust = -0.35, hjust = -10) +
+    scale_x_discrete(labels=c("Estoque Inicial\nmar-23", "Entradas\nmar-23","Saídas\nmar-23",
+                              "Entradas\nabr-23","Saídas\nabr-23",
+                              "Entradas\nmai-23","Saídas\nmai-23",
+                              "Entradas\njun-23","Saídas\njun-23","Estoque\nFinal")) +
+    theme_bw() +
+    theme(axis.title = element_blank(),
+          axis.text.x = element_text(size = 12.8, colour = "black"),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank(),
+          
+          plot.title = element_text(size=24),
+          panel.grid.major = element_blank(), 
+          panel.grid.minor = element_blank())
+
+  
+  
+# waterfall(calc_total = TRUE,
+  #           fill_by_sign = FALSE,
+  #           fill_colours = c("red","red","green", "red","green",
+  #                            "red", "green", "red","green"),
+  #           total_rect_color = "orange",
+  #           total_rect_text_color = "black") +
+  # geom_hline(yintercept = kyp*0.8) +
+  # annotate("text", x = "EI mar-23", y = kyp*0.8, label = "-20%", vjust = -0.35) +
+  # geom_hline(yintercept = kyp*0.6) +
+  # annotate("text", x = "EI mar-23", y = kyp*0.6, label = "-40%", vjust = -0.35) +
+  # # geom_hline(yintercept = jto*0.7) +
+  # # annotate("text", x = "EI mar-23", y = jto*0.7, label = "-30%", vjust = -0.35) +
+  # theme_bw() +
+  # theme(axis.title = element_blank(),
+  #       axis.text.y = element_blank(),
+  #       plot.title = element_text(size=24)) 
+```
+
+#### Observamos no gráfico acima que houve uma dimiuição de `r kyp - sum(todas_regio$variacao)` processos, representando `r round((kyp - sum(todas_regio$variacao))*100/kyp, 0)`% do estoque inicial em março.
+
+
+### __03.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("03.01")
+```
+
+#### `r escreve_frase("03.01") `
+
+### __07.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("07.01")
+```
+
+#### `r escreve_frase("07.01") `
+
+### __10.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("10.01")
+```
+
+
+#### `r escreve_frase("10.01") `
+
+### __17.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("17.01")
+```
+
+#### `r escreve_frase("17.01") `
+
+### __20.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("20.01")
+```
+
+#### `r escreve_frase("20.01") `
+
+### __22.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("22.01")
+```
+
+#### `r escreve_frase("22.01") `
+
+
+### __24.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("24.01")
+```
+
+#### `r escreve_frase("24.01") `
+
+### __33.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("33.01")
+```
+
+#### `r escreve_frase("33.01") `
+
+### __34.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("34.01")
+```
+
+#### `r escreve_frase("34.01") `
+
+### __39.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("39.01")
+```
+
+#### `r escreve_frase("39.01") `
+
+### __63.01__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("63.01")
+```
+
+#### `r escreve_frase("63.01") `
+
+### __64.09__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("64.09")
+```
+
+#### `r escreve_frase("64.09") `
+
+### __64.12__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("64.12")
+```
+
+#### `r escreve_frase("64.12") `
+
+### __DAC__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("DAC")
+```
+
+#### `r escreve_frase("DAC") `
+
+### __SUACO__
+```{r, message=FALSE, fig.width=12, fig.height=7}
+faz_grafico_cascata_processos("SUACO")
+```
+
+#### `r escreve_frase("SUACO") `
+
+### __Obs.__
+
+#### As linhas pontilhadas horizontais indicam 75%, 50% e 25% do estoque inicial de março.
+
+
+### __Forma de calcular.__
+
+#### O estoque inicial de um período é igual ao estoque final do período anterior, dado por "Processos com andamento aberto na unidade ao final do período:".
+#### As  entradas são calculadas subtraindo-se o estoque inicial de "Processos com tramitação no período:".
+#### As saídas são representadas por "Processos com andamento fechado na unidade ao final do período:".
+
+
