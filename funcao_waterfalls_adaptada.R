@@ -1,3 +1,6 @@
+library(dplyr)
+library(ggplot2)
+
 # 1. Função waterfalls adaptada. ------------------------------------------
 
 # Tenho usado a função para gráfico de cascata para demonstras as variações nas quantidade de processos, porém entendi que foram necessárias muitas adaptações.
@@ -11,7 +14,7 @@ waterfall_adaptado <- function(.data = NULL,
                       values, labels,
                       rect_text_labels = values,
                       # Vou testar com os valores 1.2, 1.5 etc.
-                      rect_text_size = 1.5,
+                      rect_text_size = 1.6,
                       # Podemos usar outros valores.
                       # "center", "top", "bottom", "left", "right", "topleft", "topright", "bottomleft", e "bottomright"
                       rect_text_labels_anchor = "center",
@@ -289,7 +292,7 @@ faz_grafico_cascata_processos <- function(audr) {
               fill_by_sign = FALSE,
               fill_colours = c("red","red","green", "red","green",
                                     "red", "green", "red","green"),
-                                    total_rect_color = "orange",
+                                    total_rect_color = "#dd4814",
               total_rect_text_color = "black") +
     labs(title = paste("Estoque, entradas e saídas de processos na caixa da",audr),
          caption = "fonte: SEI-RJ/Estatísticas") +
