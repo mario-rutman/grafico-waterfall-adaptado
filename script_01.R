@@ -311,6 +311,7 @@ faz_grafico_cascata_processos <- function(audr) {
                        total_rect_text_color = "black") +
     labs(title = paste("Estoque, entradas e saídas de processos na caixa da",audr),
          caption = "fonte: SEI-RJ/Estatísticas") +
+    geom_hline(yintercept = jto*1.00, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
     geom_hline(yintercept = jto*0.75, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
     # annotate("text", x = "EI mar-23", y = jto*0.9, label = "-10%", vjust = -0.35, hjust = -10) +
     geom_hline(yintercept = jto*0.5, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
@@ -349,19 +350,19 @@ ei <- grafico_cascata_proc_sei |>
   filter(periodo == "EI mar-23")
 
 # Depois calculamos a variação.
-variacao <- grafico_cascata_proc_sei |>
+tod <- grafico_cascata_proc_sei |>
   filter(periodo != "EI mar-23") |> 
   group_by(caixa_SEI) |> 
   summarise(variacao_total = sum(variacao))
 
 # Juntando os dois dfs.
-prepara_frase <- bind_cols(ei, variacao) |> 
+prepara_frase <- bind_cols(ei, tod) |> 
   select(caixa_sei = caixa_SEI...1,
-         estoq_inic = variacao,
-         variacao = variacao_total) |> 
-  mutate(aument_dimin = if_else(variacao >= 0, "um aumento", "uma diminuição"),
-         quant_proc = abs(variacao),
-         perc_proc = round(abs((variacao * 100/estoq_inic)), 0)) |> 
+         variacao,
+         var_tot = variacao_total) |> 
+  mutate(aument_dimin = if_else(var_tot >= 0, "um aumento", "uma diminuição"),
+         quant_proc = abs(var_tot),
+         perc_proc = round(abs((var_tot * 100/variacao)), 0)) |> 
   mutate(a_frase = glue("Em relação ao estoque inicial de março, observamos {aument_dimin} de {quant_proc} processos ({perc_proc}%).")) |>
   arrange(caixa_sei)
 
