@@ -1,6 +1,6 @@
 ---
 title: "Entradas, saídas e estoque de processos nas caixas SEI."
-author: "Mário Rutman, 3-abr-2023"
+author: "Mário Rutman, 1º de maio de 2023"
 date: ""
 output: 
   html_document:
@@ -14,6 +14,7 @@ knitr::opts_chunk$set(echo = FALSE)
 library(ggplot2)
 library(dplyr)
 library(waterfalls)
+library(gt)
 
 # Carregando o arquivo principal.
 grafico_cascata_proc_sei <- readRDS("data-raw/rds/grafico_cascata_proc_sei.rds")
@@ -51,6 +52,7 @@ todas_regio |>
                        total_rect_text_color = "black") +
     labs(title = "Estoque, entradas e saídas de processos de todas Regionais, DAC e SUACO",
          caption = "fonte: SEI-RJ/Estatísticas") +
+    geom_hline(yintercept = kyp*1.00, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
     geom_hline(yintercept = kyp*0.75, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
     # annotate("text", x = "EI mar-23", y = jto*0.9, label = "-10%", vjust = -0.35, hjust = -10) +
     geom_hline(yintercept = kyp*0.5, linetype = "dotted", size = 0.8, color="black", alpha = 0.7) +
@@ -199,16 +201,54 @@ faz_grafico_cascata_processos("DAC")
 faz_grafico_cascata_processos("SUACO")
 ```
 
-#### `r escreve_frase("SUACO") `
+#### `r escreve_frase("SUACO")`
+
+### __Tabela resumo.__
+```{r, message=FALSE}
+
+# Pegando o estoque inicial
+ei <- grafico_cascata_proc_sei |>
+  filter(periodo == "EI mar-23")
+
+# Calculando a variação.
+variacao <- grafico_cascata_proc_sei |>
+  filter(periodo != "EI mar-23") |>
+  group_by(caixa_SEI) |>
+  summarise(variacao_total = sum(variacao))
+
+# Juntando os dois dfs.
+df_para_tab <- bind_cols(ei, variacao) |>
+  select(caixa_sei = caixa_SEI...1,
+         estoq_inic = variacao,
+         delta = variacao_total) |>
+  mutate(delta_perc = delta/estoq_inic) |>
+  arrange(delta_perc)
+
+gt(df_para_tab)|>
+  tab_header(
+    title = md("__Estoque inicial de processos e sua variação de 1º de março a 30 de abril.__")) |>
+   tab_source_note(
+    source_note = "fonte: SEI/Estatísticas.") |>
+  fmt_percent(columns = delta_perc, decimals = 0) |>
+    cols_label(
+    caixa_sei = html("Caixa do SEI"),
+    estoq_inic = html("Estoque Incial<br>de março"),
+    delta = html("Variação"),
+    delta_perc = html("Variação<br>percentual")
+  )
+
+
+```
+
 
 ### __Obs.__
 
-#### As linhas pontilhadas horizontais indicam 75%, 50% e 25% do estoque inicial de março.
+#### As linhas pontilhadas horizontais indicam 100%, 75%, 50% e 25% do estoque inicial de março.
 
 
 ### __Forma de calcular.__
 
-#### O estoque inicial de um período é igual ao estoque final do período anterior, dado por "Processos com andamento aberto na unidade ao final do período:".
+#### O estoque inicial de um período é igual ao estoque final do período anterior, que é dado por "Processos com andamento aberto na unidade ao final do período:".
 #### As  entradas são calculadas subtraindo-se o estoque inicial de "Processos com tramitação no período:".
 #### As saídas são representadas por "Processos com andamento fechado na unidade ao final do período:".
 
